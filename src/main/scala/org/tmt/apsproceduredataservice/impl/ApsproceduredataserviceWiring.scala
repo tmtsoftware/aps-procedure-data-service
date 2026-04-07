@@ -11,7 +11,20 @@ class ApsproceduredataserviceWiring(val port: Option[Int]) extends ServerWiring 
   lazy val apsproceduredataserviceImpl               = new ApsproceduredataserviceImpl()
 
   import actorRuntime.ec
-  lazy val apsproceduredataserviceImplWrapper        = new JApsproceduredataserviceImplWrapper(jApsproceduredataserviceImpl)
+  lazy val apsproceduredataserviceImplWrapper =
+    new JApsproceduredataserviceImplWrapper(jApsproceduredataserviceImpl)
 
-  override lazy val routes: Route = new ApsproceduredataserviceRoute(apsproceduredataserviceImpl, apsproceduredataserviceImplWrapper, securityDirectives).route
+  // Just an example of subscribing to the Event Service, which the Exposure Service will do.
+  // The example code here is for implementation example only, it is never used by the Procedure Data Service.
+  // Start the exposureStoreCompleted subscription when the service wires up.
+  // Called after jApsproceduredataserviceImpl is constructed so jCswServices
+  // is fully initialised before the event subscriber connects.
+  jApsproceduredataserviceImpl.subscribeToExposureEvents()
+
+  override lazy val routes: Route =
+    new ApsproceduredataserviceRoute(
+      apsproceduredataserviceImpl,
+      apsproceduredataserviceImplWrapper,
+      securityDirectives
+    ).route
 }
