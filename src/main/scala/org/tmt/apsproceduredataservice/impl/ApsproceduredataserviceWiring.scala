@@ -9,8 +9,9 @@ class ApsproceduredataserviceWiring(val port: Option[Int]) extends ServerWiring 
 
   lazy val jApsproceduredataserviceImpl: JApsproceduredataserviceImpl = new JApsproceduredataserviceImpl(jCswServices)
   lazy val apsproceduredataserviceImpl               = new ApsproceduredataserviceImpl()
-  lazy val apsproceduredataserviceImplWrapper        = new JApsproceduredataserviceImplWrapper(jApsproceduredataserviceImpl)
 
   import actorRuntime.ec
+  lazy val apsproceduredataserviceImplWrapper        = new JApsproceduredataserviceImplWrapper(jApsproceduredataserviceImpl)
+
   override lazy val routes: Route = new ApsproceduredataserviceRoute(apsproceduredataserviceImpl, apsproceduredataserviceImplWrapper, securityDirectives).route
 }

@@ -35,16 +35,16 @@ class ApsproceduredataserviceRoute(
           }
         }
       } ~
-      // ── POST /storeProcedureComputationResults ────────────────────────────
+      // ── POST /storeProcedureComputationResults — Java impl ─────────────────
       path("storeProcedureComputationResults") {
         entity(as[ComputationKeyValuePairList]) { request =>
-          complete(service1.storeProcedureComputationResults(request))
+          complete(service2.storeProcedureComputationResults(request))
         }
       } ~
-      // ── POST /getProcedureResultData ──────────────────────────────────────
+      // ── POST /getProcedureResultData — Java impl ───────────────────────────
       path("getProcedureResultData") {
         entity(as[GetProcedureResultDataRequest]) { request =>
-          complete(service1.getProcedureResultData(request))
+          complete(service2.getProcedureResultData(request))
         }
       }
     } ~

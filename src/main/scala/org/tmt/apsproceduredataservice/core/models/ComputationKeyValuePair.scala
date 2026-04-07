@@ -1,8 +1,10 @@
 package org.tmt.apsproceduredataservice.core.models
 
+import java.util.Optional
+
 case class ComputationKeyValuePairKey(
-    procedureRunId: Option[Int] = None,
-    iterationNumber: Option[Int] = None,
+    procedureRunId: Optional[Integer] = Optional.empty(),
+    iterationNumber: Optional[Integer] = Optional.empty(),
     computationName: String,
     fieldName: String
 )

@@ -1,7 +1,9 @@
 package org.tmt.apsproceduredataservice.core.models
 
+import java.util.Optional
+
 case class ComputationResultKey(
     computationName: String,
     fieldName: String,
-    iterationNumber: Option[Int] = None
+    iterationNumber: Optional[Integer] = Optional.empty()
 )
