@@ -3,6 +3,8 @@
 This project implements a prototype of the APS Procedure Data Service, an HTTP server-based application using
 TMT Executive Software ([ESW](https://github.com/tmtsoftware/esw)) APIs.
 
+This project was originated using the giter8 template: [csw-http-service-template.g8](https://github.com/tmtsoftware/csw-http-service-template.g8)
+
 The prototype supports two endpoints: /storeProcedureComputationResults and /getProcedureResultData.
 The endpoint APIs match the corresponding endpoints defined in the openAPI description provided in the APS ICD API documentation:
 (https://docushare.tmt.org/docushare/dsweb/Get/Document-96223/ICD-SDB-APS-APS_CCR03.pdf)
