@@ -1,7 +1,32 @@
 # apsproceduredataservice
 
-This project implements a sample HTTP server-based application using
+This project implements a prototype of the APS Procedure Data Service, an HTTP server-based application using
 TMT Executive Software ([ESW](https://github.com/tmtsoftware/esw)) APIs.
+
+The prototype supports two endpoints: /storeProcedureComputationResults and /getProcedureResultData.
+The endpoint APIs match the corresponding endpoints defined in the openAPI description provided in the APS ICD API documentation:
+(https://docushare.tmt.org/docushare/dsweb/Get/Document-96223/ICD-SDB-APS-APS_CCR03.pdf)
+
+The endpoint implementation uses a Concurrent Hashmap to store the data keys:
+```
+case class ComputationResultKey(
+   computationName: String,
+   fieldName: String,
+   iterationNumber: Optional[Integer] = Optional.empty()
+)
+```
+and values:
+```
+case class GenericValue(
+   `type`: String,
+   dim1: Int,
+   dim2: Int,
+   encodedStringValue: String
+)
+```
+The implementation for the endpoints is in Java, with the code being encapsulated in a single class:
+JApsproceduredataserviceImpl.java
+
 
 ## Build Instructions
 
