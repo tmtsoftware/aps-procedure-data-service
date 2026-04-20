@@ -22,7 +22,8 @@ lazy val openSite =
     }
   }
 
-
+// ── jOOQ code generation task ──────────────────────────────────────────────
+lazy val generateJooq = taskKey[Unit]("Run jOOQ code generator")
 
 /* ================= Root Project ============== */
 lazy val `apsproceduredataservice` = project
@@ -52,8 +53,47 @@ lazy val `apsproceduredataservice` = project
       Libs.`pekko-actor-testkit-typed` % Test,
       Libs.`pekko-stream-testkit` % Test
     ),
-    Test / fork := true
+    Test / fork := true,
+
+
+    // ── jOOQ codegen task ────────────────────────────────────────────────────
+    generateJooq := {
+      val log = streams.value.log
+      log.info("Running jOOQ code generator...")
+
+      val jdbc = new org.jooq.meta.jaxb.Jdbc()
+        .withDriver("org.postgresql.Driver")
+        .withUrl("jdbc:postgresql://localhost:5432/peas")
+        .withUser("postgres")
+        .withPassword("postgres")
+
+      val database = new org.jooq.meta.jaxb.Database()
+        .withName("org.jooq.meta.postgres.PostgresDatabase")
+        .withIncludes("Procedure|ProcedureIteration|ProcedureResult")
+        .withInputSchema("public")
+
+      val target = new org.jooq.meta.jaxb.Target()
+        .withPackageName("org.tmt.apsproceduredataservice.db.generated")
+        .withDirectory("src/main/java")
+
+      val generate = new org.jooq.meta.jaxb.Generate()
+        .withPojos(true)
+        .withDaos(false)
+
+      val configuration = new org.jooq.meta.jaxb.Configuration()
+        .withJdbc(jdbc)
+        .withGenerator(
+          new org.jooq.meta.jaxb.Generator()
+            .withDatabase(database)
+            .withGenerate(generate)
+            .withTarget(target)
+        )
+
+      new org.jooq.codegen.GenerationTool().run(configuration)
+      log.info("jOOQ code generation complete.")
+    }
   )
+
 
 /* ================= Paradox Docs ============== */
 lazy val docs = project

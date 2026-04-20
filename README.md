@@ -29,6 +29,22 @@ case class GenericValue(
 The implementation for the endpoints is in Java, with the code being encapsulated in a single class:
 JApsproceduredataserviceImpl.java
 
+## jOOQ Integration
+Locally, a hashmap is used as a cache for procedure result values.  For long term store, a database is used
+and jOOQ is used for database storing and retrieval.  jOOQ relies on generated classes to perform these functions.
+### jOOQ code generation
+jOOQ code generation with sbt requires specific changes to the sbt project: 
+* Libs.scala: defining vals jooq, jooq-meta, jooq-codegen, and postgresql
+* build.sbt: defining the generateJooq task (which includes the name of the database to perfom code generation on, plus database user and password to use)
+* plugins.sbt: defining library dependencies using the vals from Libs.scala
+
+To generate the jOOQ code, run: 
+```
+sbt generateJooq
+```
+Generated files are in:
+src/main/java/org/tmt/apsproceduredataservice/db.generated
+
 
 ## Build Instructions
 

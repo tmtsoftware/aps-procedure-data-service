@@ -3,6 +3,12 @@ import sbt._
 object Libs {
   val `esw-http-template-wiring` = "com.github.tmtsoftware.esw" %% "esw-http-template-wiring" % "v1.0.0"
 
+  // jOOQ
+  val `jooq`          = "org.jooq"       % "jooq"          % "3.19.6"
+  val `jooq-meta`     = "org.jooq"       % "jooq-meta"     % "3.19.6"
+  val `jooq-codegen`  = "org.jooq"       % "jooq-codegen"  % "3.19.6"
+  val `postgresql`    = "org.postgresql" % "postgresql"     % "42.7.3"
+
   //testing
   val `pekko-http-testkit` = "org.apache.pekko" %% "pekko-http-testkit" % "1.1.0"
   val `pekko-actor-testkit-typed` = "org.apache.pekko" %% "pekko-actor-testkit-typed" % "1.1.3"
