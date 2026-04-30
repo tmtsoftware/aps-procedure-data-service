@@ -45,6 +45,43 @@ sbt generateJooq
 Generated files are in:
 src/main/java/org/tmt/apsproceduredataservice/db.generated
 
+## Prerequisites for running service
+
+These instructions assume postgres database is installed on target machine.
+The following instructions are required to run CSW services, in particular
+the database service.
+
+### Setup database and Database service
+Create a directory for the database under the account that will be running CSW services.  Set the environment variable PGDATA to point to that directory.
+
+run `<initdb $PGDATA -E utf8>`
+
+`<csw-services start -d>`
+
+`<vi /tmp/pg_hba.conf*.tmp>`   and change all ‘passwords’ to ‘trust’
+
+`<ps auwx | grep postgres>`
+
+`<kill -HUP <postgresPid>>`
+
+Now a psql session should be possible:
+
+`<psql postgres -h localhost>`
+
+and create the user/password you will be using to access the database:
+
+`<CREATE USER <username>;>`
+
+`<ALTER USER <username> WITH PASSWORD '<mypassword>';`>
+
+
+And create the associated database:
+
+`<CREATE DATABASE <username>;>`
+
+Exit the psql session and restart the csw-services.
+
+
 
 ## Build Instructions
 

@@ -51,7 +51,10 @@ lazy val `apsproceduredataservice` = project
       Libs.`junit4-interface` % Test,
       Libs.`testng-6-7` % Test,
       Libs.`pekko-actor-testkit-typed` % Test,
-      Libs.`pekko-stream-testkit` % Test
+      Libs.`pekko-stream-testkit` % Test,
+      Libs.`csw-database`,
+      Libs.`jooq`,
+      Libs.`postgresql`
     ),
     Test / fork := true,
 

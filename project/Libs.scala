@@ -9,6 +9,9 @@ object Libs {
   val `jooq-codegen`  = "org.jooq"       % "jooq-codegen"  % "3.19.6"
   val `postgresql`    = "org.postgresql" % "postgresql"     % "42.7.3"
 
+  // CSW database service
+  val `csw-database` = "com.github.tmtsoftware.csw" %% "csw-database" % "6.0.0"
+
   //testing
   val `pekko-http-testkit` = "org.apache.pekko" %% "pekko-http-testkit" % "1.1.0"
   val `pekko-actor-testkit-typed` = "org.apache.pekko" %% "pekko-actor-testkit-typed" % "1.1.3"

@@ -12,21 +12,20 @@ import csw.params.javadsl.JKeyType;
 import csw.prefix.javadsl.JSubsystem;
 import csw.prefix.models.Prefix;
 import esw.http.template.wiring.JCswServices;
-import org.tmt.apsproceduredataservice.core.models.ComputationKeyValuePair;
-import org.tmt.apsproceduredataservice.core.models.ComputationKeyValuePairList;
-import org.tmt.apsproceduredataservice.core.models.GetProcedureResultDataRequest;
-import org.tmt.apsproceduredataservice.core.models.GreetResponse;
+import org.tmt.apsproceduredataservice.core.models.*;
+import org.tmt.apsproceduredataservice.db.ProcedureDbService;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class JApsproceduredataserviceImpl {
 
     private final JCswServices jCswServices;
+
+    private final ProcedureDbService procedureDbService;
+
+
 
     // In-memory store keyed by StoreKey.
     // Prototype implementation — does not persist to database.
@@ -58,10 +57,38 @@ public class JApsproceduredataserviceImpl {
 
     // ── Constructor ───────────────────────────────────────────────────────────
 
-    public JApsproceduredataserviceImpl(JCswServices jCswServices) {
+    public JApsproceduredataserviceImpl(JCswServices jCswServices, ProcedureDbService procedureDbService) {
         this.jCswServices = jCswServices;
-    }
+        this.procedureDbService = procedureDbService;
 
+        // pre-fill store:
+
+        // in out test, we have these pre-initialized from a 'previous step'
+        String centroidOffsetsX = "-0.172f, -0.783f, -0.736f, 1.541f, 0.937f, 0.688f, -0.573f, -1.473f, -1.925f, -1.406f, " +
+                "-1.861f, -0.151f, 0.814f, 0.688f, 2.336f, 2.152f, 2.830f, 1.567f, -0.722f, -2.009f, -2.523f, -3.187f, " +
+                "-2.840f, -2.990f, -3.044f, -1.716f, 5.332f, -5.395f, 1.456f, 1.453f, 2.334f, 2.370f, 1.381f, 2.058f, 2.213f, 1.357f";
+
+        String centroidOffsetsY = "0.770f, 0.790f, -0.227f, -0.840f, -0.596f, -0.002f, 2.184f, 1.379f, 1.673f, 0.891f, -1.017f, " +
+                "-1.913f, -2.428f, -1.720f, -1.569f, -0.760f, -1.677f, 1.239f, 3.146f, 3.277f, 2.767f, 2.677f, 1.470f, -0.154f, " +
+                "-1.825f, -2.638f, 3.006f, -9.161f, -2.118f, -2.004f, 0.162f, -2.130f, -0.984f, 3.866f, 1.741f, 2.723f";
+
+        ComputationKeyValuePairKey keyX = new ComputationKeyValuePairKey(Optional.of(1), Optional.empty(), "centroidOffsets",
+                "centroidOffsetsX");
+        GenericValue valueX = new GenericValue("float", 36, 0, centroidOffsetsX);
+        ComputationKeyValuePair kvpX = new ComputationKeyValuePair(keyX, valueX);
+        StoreKey storeKeyX = new StoreKey(1,"centroidOffsets", "centroidOffsetsX", Optional.empty());
+        store.put(storeKeyX, kvpX);
+
+        ComputationKeyValuePairKey keyY = new ComputationKeyValuePairKey(Optional.of(1), Optional.empty(), "centroidOffsets",
+                "centroidOffsetsY");
+        GenericValue valueY = new GenericValue("float", 36, 0, centroidOffsetsY);
+        ComputationKeyValuePair kvpY = new ComputationKeyValuePair(keyY, valueY);
+        StoreKey storeKeyY = new StoreKey(1,"centroidOffsets", "centroidOffsetsY", Optional.empty());
+        store.put(storeKeyY, kvpY);
+
+
+
+    }
     // ── Event subscription ────────────────────────────────────────────────────
 
     /**
@@ -122,6 +149,9 @@ public class JApsproceduredataserviceImpl {
     // ── POST /storeProcedureComputationResults ────────────────────────────────
 
     public CompletableFuture<Void> storeProcedureComputationResults(ComputationKeyValuePairList request) {
+        jCswServices.loggerFactory()
+                .getLogger(getClass())
+                .info("storeProcedureComputationResults");
         for (ComputationKeyValuePair kvp : request.keyValuePairList()) {
             int runId = kvp.key().procedureRunId().orElse((Integer) request.procedureRunId());
             StoreKey key = new StoreKey(
@@ -132,12 +162,18 @@ public class JApsproceduredataserviceImpl {
             );
             store.put(key, kvp);
         }
+        // Fire-and-forget async DB write — does not block the HTTP response
+        procedureDbService.insertResultsAsync(request);
+
         return CompletableFuture.completedFuture(null);
     }
 
     // ── POST /getProcedureResultData ──────────────────────────────────────────
 
     public CompletableFuture<List<ComputationKeyValuePair>> getProcedureResultData(GetProcedureResultDataRequest request) {
+        jCswServices.loggerFactory()
+                .getLogger(getClass())
+                .info("getProcedureResultData: " + request.computationResultKeys().get(0).computationName() + ", " + request.computationResultKeys().get(0).fieldName());
         List<ComputationKeyValuePair> results = new ArrayList<>();
         for (var resultKey : request.computationResultKeys()) {
             StoreKey key = new StoreKey(
